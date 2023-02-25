@@ -1,0 +1,22 @@
+{
+  "name": "demoneback",
+  "version": "1.0.0",
+  "description": "Demo One Backend",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bymoer/DemOneBack.git"
+  },
+  "keywords": [
+    "Backend"
+  ],
+  "author": "Moer",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/bymoer/DemOneBack/issues"
+  },
+  "homepage": "https://github.com/bymoer/DemOneBack#readme"
+}
