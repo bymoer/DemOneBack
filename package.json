@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Demo One Backend",
   "main": "src/index.js",
+  "private": true,
   "scripts": {
+    "start": "node ./src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/bymoer/DemOneBack/issues"
   },
-  "homepage": "https://github.com/bymoer/DemOneBack#readme"
+  "homepage": "https://github.com/bymoer/DemOneBack#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
