@@ -1,0 +1,23 @@
+// tsconfig.json
+{
+    "compilerOptions": {
+      // from extending off "@tsconfig/node16/tsconfig.json"
+      "lib": ["es2021.intl"],
+      "module": "CommonJS",
+      "target": "es2021",
+  
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      // end of @tsconfig/node16/tsconfig.json
+  
+      "baseUrl": "src",
+      "outDir": "dist"
+    },
+    "include": [
+        "src/**/*.ts*",
+        "src/**/*.*.ts*"
+    ],
+    "exclude": ["node_modules"]
+  }
