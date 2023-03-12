@@ -5,10 +5,8 @@ import { USER_MODEL } from './user.model.js';
 mongoose.Promise = global.Promise;
 
 // NO, NO, NO - bad solution.......
-export const dbHelper: any = {};
-
+export const dbHelper = {};
 dbHelper.mongoose = mongoose;
-
 dbHelper.booking = BOOKING_MODEL;
 dbHelper.role = ROLE_MODEL;
 dbHelper.user = USER_MODEL;

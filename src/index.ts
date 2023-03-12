@@ -1,7 +1,6 @@
 import express from 'express';
-import { blabla } from './models/index.js';
-import { testFind, createClient } from './mongodb/conn.js';
-import { userAuthKey } from './config/auth.config.js';
+import { dbConfig } from './config/db.config.js';
+import { dbHelper } from './models/index.js';
 
 const app = express();
 
@@ -9,33 +8,65 @@ const router = express.Router();
 
 const port = 5000;
 
-//const ROLES = dbHelper.ROLES;
+const Role = dbHelper.role;
 
-console.log(userAuthKey);
+dbHelper.mongoose
+        .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        })
+        .then(() => {
+          console.log('Connected to MongoDB');
+          initial();
+        })
+        .catch( (err: Error) => {
+          console.error('Connection error', err);
+          process.exit();
+        });
 
-router.get('/test', (req, res) => {
-  res.send('<h1>TEST PAGE</h1><p>If you are seeing this page, you are hopefully just testing. Otherwise.....crap!</p>')
-})
+const initial = async () => {
 
-/*
-router.get('/testdb', async (req, res) => {
+  const rolesInDb = await Role.find({});
 
-  try {
-    const client = await createClient();
-    const db = client.db('test');
-    const collection = db.collection('BirdCollection');
-    const results = await collection.find().toArray();
-    res.json(results);
-  } catch (e) {
-    console.log('Error: ', e);
+  if(rolesInDb === undefined || null){
+
+    new Role({
+      name: 'user'
+    })
+    .save()
+    .then(
+      () => {
+        console.log('\'user\' was added to DB');
+    });
+  
+    new Role({
+      name: 'moderator'
+    })
+    .save()
+    .then(
+      () => {
+        console.log('\'moderator\' was added to DB');
+    });
+  
+    new Role({
+      name: 'admin'
+    })
+    .save()
+    .then(
+      () => {
+        console.log('\'admin\' was added to DB');
+    });
   }
 
-})
-*/
 
-router.get('/',(req, res) => {
-  //console.log(dbHelper.booking);
-  res.send('<h1>Hello world ! Index page here....ay</h1>')
+  console.log(rolesInDb);
+
+
+}
+
+
+router.get('/', (req, res) => {
+  res.send('<h1>Hello World</h1><p>The index of localhost.</p>');
 })
 
 app.use('/api', router);

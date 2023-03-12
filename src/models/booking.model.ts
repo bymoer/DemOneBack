@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 
 export const BOOKING_MODEL = mongoose.model(
-    "Booking",
+    'Booking',
     new mongoose.Schema({
         customerFirstName: String,
         customerMiddleName: String,
