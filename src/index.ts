@@ -1,8 +1,14 @@
 import express from 'express';
+import cors from 'cors';
+import cookieSession from 'cookie-session';
 import { dbConfig } from './config/db.config.js';
 import { dbHelper } from './models/index.js';
 
 const app = express();
+
+// Importing router files
+import userRouter from './routes/user.routes.js';
+import authRouter from './routes/auth.routes.js';
 
 const router = express.Router();
 
@@ -70,6 +76,12 @@ router.get('/', (req, res) => {
 })
 
 app.use('/api', router);
+
+app.use(express.json());
+
+// Import of router files
+app.use(userRouter);
+app.use(authRouter);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

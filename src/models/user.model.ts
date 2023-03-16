@@ -12,9 +12,11 @@ export const USER_MODEL = mongoose.model(
         userUserName: String,
         userEmail: String,
         userPassword: String,
-        userRole: {
+        userRole: [
+            {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Role'
-        }
+            }
+        ]
     })
 )

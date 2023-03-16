@@ -1,15 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import { dbHelper } from "../models/index.js";
+import { USER_MODEL } from "../models/user.model.js";
+import { IUser } from "../types/user.type.js";
 
 const ROLES = dbHelper.ROLES;
 const User = dbHelper.user;
+//const User = USER_MODEL;
 
 const checkDuplicateUsernameOrEmail = (req: Request, res: Response, next: NextFunction) => {
 
     // Check username
     User.findOne({
         userUserName: req.body.username
-    }).exec((err: Error, user: any) => {
+    }).exec((err: Error, user: IUser) => {
         if(err) {
             res.status(500).send(
                 { 

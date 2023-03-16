@@ -2,6 +2,10 @@ import express from 'express';
 import { dbConfig } from './config/db.config.js';
 import { dbHelper } from './models/index.js';
 const app = express();
+
+// Importing router files
+import userRouter from './routes/user.routes.js';
+import authRouter from './routes/auth.routes.js';
 const router = express.Router();
 const port = 5000;
 const Role = dbHelper.role;
@@ -40,6 +44,11 @@ router.get('/', (req, res) => {
   res.send('<h1>Hello World</h1><p>The index of localhost.</p>');
 });
 app.use('/api', router);
+app.use(express.json());
+
+// Import of router files
+app.use(userRouter);
+app.use(authRouter);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

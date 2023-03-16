@@ -6,10 +6,11 @@ export const USER_MODEL = mongoose.model('User', new mongoose.Schema({
   userAddressRoad: String,
   userAddressRoadNumber: String,
   userPhoneNr: String,
+  userUserName: String,
   userEmail: String,
   userPassword: String,
-  userRole: {
+  userRole: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Role'
-  }
+  }]
 }));
