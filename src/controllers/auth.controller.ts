@@ -18,22 +18,25 @@ export const signup = (req: Request, res: Response) => {
         userPassword: bcrypt.hashSync(req.body.password, 8)
     });
 
-    user.save((err: Error, user: IUser) => {
-        if(err){
-            res.status(500).send(
-                {
-                    message: err
-                }
-            );
-            return;
-        }
+    user.save(user)
+        .then((err: Error) => {
 
-        if(req.body.roles){
-            Role.find(
-                {
-                    name: {$in: req.body.roles},
-                },
-                (err: Error, roles: Array<IUserRole> ) => {
+            if(err){
+                res.status(500).send(
+                    {
+                        message: err
+                    }
+                );
+                return;
+            }
+
+            if(req.body.roles){
+                Role.find(
+                    {
+                        name: {$in: req.body.roles},
+                    }
+                )
+                .then((err: Error, roles: Array<IUserRole>) => {
                     if(err){
                         res.status(500).send(
                             {
@@ -44,30 +47,32 @@ export const signup = (req: Request, res: Response) => {
                     }
 
                     user.userRole = roles.map((role) => role._id);
-                    user.save((err: Error) => {
-                        if(err){
-                            res.status(500).send(
+                    user.save()
+                        .then((err: Error) => {
+                            if(err){
+                                res.status(500).send(
+                                    {
+                                        message: err
+                                    }
+                                );
+                                return;
+                            }
+
+                            res.send(
                                 {
-                                    message: err
+                                    message: 'User was registered successfully!'
                                 }
                             );
-                            return;
-                        }
 
-                        res.send(
-                            {
-                                message: 'User was registered successfully!'
-                            }
-                        );
-                    })
-                }
-            )
-        } else {
-            Role.findOne(
-                {
-                    name: 'user'
-                },
-                (err: Error, role: IUserRole) => {
+                        })
+                })
+            } else {
+                Role.findOne(
+                    {
+                        name: 'User'
+                    }
+                )
+                .then((err: Error, role: IUserRole) => {
                     if(err){
                         res.status(500).send(
                             {
@@ -78,26 +83,29 @@ export const signup = (req: Request, res: Response) => {
                     }
 
                     user.roles = [role._id];
-                    user.save((err: Error) => {
-                        if(err){
-                            res.status(500).send(
+                    user.save()
+                        .then((err: Error) => {
+
+                            if(err){
+                                res.status(500).send(
+                                    {
+                                        message: err
+                                    }
+                                );
+                                return;
+                            }
+    
+                            res.send(
                                 {
-                                    message: err
+                                    message: 'User was registered successfully!'
                                 }
                             );
-                            return;
-                        }
 
-                        res.send(
-                            {
-                                message: 'User was registered successfully!'
-                            }
-                        );
-                    });
-                }
-            )
-        }
-    });
+                        })
+                })
+            }
+
+        })
 
 }
 

@@ -11,7 +11,7 @@ export const signup = (req, res) => {
     userEmail: req.body.email,
     userPassword: bcrypt.hashSync(req.body.password, 8)
   });
-  user.save((err, user) => {
+  user.save(user).then(err => {
     if (err) {
       res.status(500).send({
         message: err
@@ -23,7 +23,7 @@ export const signup = (req, res) => {
         name: {
           $in: req.body.roles
         }
-      }, (err, roles) => {
+      }).then((err, roles) => {
         if (err) {
           res.status(500).send({
             message: err
@@ -31,7 +31,7 @@ export const signup = (req, res) => {
           return;
         }
         user.userRole = roles.map(role => role._id);
-        user.save(err => {
+        user.save().then(err => {
           if (err) {
             res.status(500).send({
               message: err
@@ -45,8 +45,8 @@ export const signup = (req, res) => {
       });
     } else {
       Role.findOne({
-        name: 'user'
-      }, (err, role) => {
+        name: 'User'
+      }).then((err, role) => {
         if (err) {
           res.status(500).send({
             message: err
@@ -54,7 +54,7 @@ export const signup = (req, res) => {
           return;
         }
         user.roles = [role._id];
-        user.save(err => {
+        user.save().then(err => {
           if (err) {
             res.status(500).send({
               message: err
@@ -68,7 +68,86 @@ export const signup = (req, res) => {
       });
     }
   });
+
+  /*
+  user.save((err: Error, user: IUser) => {
+      if(err){
+          res.status(500).send(
+              {
+                  message: err
+              }
+          );
+          return;
+      }
+       if(req.body.roles){
+          Role.find(
+              {
+                  name: {$in: req.body.roles},
+              },
+              (err: Error, roles: Array<IUserRole> ) => {
+                  if(err){
+                      res.status(500).send(
+                          {
+                              message: err
+                          }
+                      );
+                      return;
+                  }
+                   user.userRole = roles.map((role) => role._id);
+                  user.save((err: Error) => {
+                      if(err){
+                          res.status(500).send(
+                              {
+                                  message: err
+                              }
+                          );
+                          return;
+                      }
+                       res.send(
+                          {
+                              message: 'User was registered successfully!'
+                          }
+                      );
+                  })
+              }
+          )
+      } else {
+          Role.findOne(
+              {
+                  name: 'user'
+              },
+              (err: Error, role: IUserRole) => {
+                  if(err){
+                      res.status(500).send(
+                          {
+                              message: err
+                          }
+                      );
+                      return;
+                  }
+                   user.roles = [role._id];
+                  user.save((err: Error) => {
+                      if(err){
+                          res.status(500).send(
+                              {
+                                  message: err
+                              }
+                          );
+                          return;
+                      }
+                       res.send(
+                          {
+                              message: 'User was registered successfully!'
+                          }
+                      );
+                  });
+              }
+          )
+      }
+  });
+  */
 };
+
 export const signin = (req, res) => {
   User.findOne({
     userUsername: req.body.username
