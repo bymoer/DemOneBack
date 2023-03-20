@@ -18,46 +18,33 @@ export const signup = (req: Request, res: Response) => {
         userPassword: bcrypt.hashSync(req.body.password, 8)
     });
 
-    user.save(user)
-        .then((err: Error) => {
-
-            if(err){
-                res.status(500).send(
-                    {
-                        message: err
-                    }
-                );
-                return;
+    // Check for user roles supplied
+    if(req.body.roles.length == 0 || req.body.roles == undefined){
+        res.status(400).send(
+            {
+                message: 'No User Roles supplied! Please supply User Roles!'
             }
+        )
+        return;
+    }
 
+    // Save user
+    user.save(user)
+        .then((user: IUser) => {
+            
             if(req.body.roles){
+
                 Role.find(
                     {
                         name: {$in: req.body.roles},
                     }
                 )
-                .then((err: Error, roles: Array<IUserRole>) => {
-                    if(err){
-                        res.status(500).send(
-                            {
-                                message: err
-                            }
-                        );
-                        return;
-                    }
-
+                .then((roles: Array<IUserRole>) => {
+ 
                     user.userRole = roles.map((role) => role._id);
                     user.save()
-                        .then((err: Error) => {
-                            if(err){
-                                res.status(500).send(
-                                    {
-                                        message: err
-                                    }
-                                );
-                                return;
-                            }
-
+                        .then(() => {
+      
                             res.send(
                                 {
                                     message: 'User was registered successfully!'
@@ -65,46 +52,40 @@ export const signup = (req: Request, res: Response) => {
                             );
 
                         })
+                        .catch((err: Error) => {
+                            res.status(400).send(
+                                {
+                                    message: err
+                                }
+                            );
+                            return;
+                        })
+                })
+                .catch((err: Error) => {
+                    res.status(400).send(
+                        {
+                            message: err
+                        }
+                    );
+                    return;
                 })
             } else {
-                Role.findOne(
+                res.status(400).send(
                     {
-                        name: 'User'
+                        message: 'No user roles supplied!'
                     }
                 )
-                .then((err: Error, role: IUserRole) => {
-                    if(err){
-                        res.status(500).send(
-                            {
-                                message: err
-                            }
-                        );
-                        return;
-                    }
-
-                    user.roles = [role._id];
-                    user.save()
-                        .then((err: Error) => {
-
-                            if(err){
-                                res.status(500).send(
-                                    {
-                                        message: err
-                                    }
-                                );
-                                return;
-                            }
-    
-                            res.send(
-                                {
-                                    message: 'User was registered successfully!'
-                                }
-                            );
-
-                        })
-                })
+                return;
             }
 
+        })
+        .catch((err: Error) => {
+            res.status(400).send(
+                {
+                    message: err
+                }
+            );
+            return;
         })
 
 }
@@ -112,19 +93,19 @@ export const signup = (req: Request, res: Response) => {
 export const signin = (req: Request, res: Response) => {
     User.findOne(
         {
-            userUsername: req.body.username
+            userUserName: req.body.username
         }
     )
-    .populate('roles', '-__v')
-    .exec((err: Error, user: IUser) => {
-        if(err){
-            res.status(500).send(
-                {
-                    message: err
-                }
-            );
-            return;
-        }
+    .populate('userRole', '-__v')
+    .then((user: IUser) => {
+        // if(err){
+        //     res.status(500).send(
+        //         {
+        //             message: err
+        //         }
+        //     );
+        //     return;
+        // }
 
         if(!user){
             return res.status(404).send(
@@ -152,8 +133,8 @@ export const signin = (req: Request, res: Response) => {
         // Should have a type !!??
         let authorities = [];
 
-        for (let i = 0; i < user.roles.length; i++) {
-            authorities.push('Role_' + user.roles[i].name.toUpperCase());
+        for (let i = 0; i < user.userRole.length; i++) {
+            authorities.push('Role_' + user.userRole[i].name.toUpperCase());
         }
 
         // Might be a little.....
@@ -168,6 +149,13 @@ export const signin = (req: Request, res: Response) => {
             }
         );
     });
+    // .catch((err: Error) => {
+    //     res.status(400).send(
+    //         {
+    //             message: err
+    //         }
+    //     )
+    // });
 }
 
 export const signout = async(req: Request, res: Response) => {

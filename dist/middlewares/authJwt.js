@@ -6,6 +6,10 @@ const Role = dbHelper.role;
 const secret = userAuthKey.secret;
 const verifyToken = (req, res, next) => {
   let token = req.session?.token;
+
+  // console.log('This is the token from verifyToken: ')
+  // console.log(token)
+
   if (!token) {
     return res.status(403).send({
       message: "No token provided!"
@@ -13,6 +17,8 @@ const verifyToken = (req, res, next) => {
   }
 
   // Not the best solution - fix any
+
+  console.log(secret);
   jwt.verify(token, secret, (err, decoded) => {
     if (err) {
       return res.status(401).send({
@@ -21,6 +27,10 @@ const verifyToken = (req, res, next) => {
     }
 
     // Using body instead of setting it directly on the req obj - typescript doesn't like
+
+    console.log('This should be the decoded id: ');
+    console.log(decoded.id);
+    console.log(decoded);
     req.body.userId = decoded.id;
     next();
   });
@@ -55,6 +65,8 @@ const isAdmin = (req, res, next) => {
   });
 };
 const isModerator = (req, res, next) => {
+  //console.log(req.body.userId);
+
   User.findById(req.body.userId).exec((err, user) => {
     if (err) {
       res.status(500).send({

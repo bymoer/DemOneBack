@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieSession from 'cookie-session';
 import { dbConfig } from './config/db.config.js';
 import { dbHelper } from './models/index.js';
 const app = express();
@@ -45,6 +46,11 @@ router.get('/', (req, res) => {
 });
 app.use('/api', router);
 app.use(express.json());
+app.use(cookieSession({
+  name: 'demone-session',
+  secret: 'COOKIE_SECRET',
+  httpOnly: true
+}));
 
 // Import of router files
 app.use(userRouter);

@@ -11,153 +11,66 @@ export const signup = (req, res) => {
     userEmail: req.body.email,
     userPassword: bcrypt.hashSync(req.body.password, 8)
   });
-  user.save(user).then(err => {
-    if (err) {
-      res.status(500).send({
-        message: err
-      });
-      return;
-    }
+
+  // Check for user roles supplied
+  if (req.body.roles.length == 0 || req.body.roles == undefined) {
+    res.status(400).send({
+      message: 'No User Roles supplied! Please supply User Roles!'
+    });
+    return;
+  }
+
+  // Save user
+  user.save(user).then(user => {
     if (req.body.roles) {
       Role.find({
         name: {
           $in: req.body.roles
         }
-      }).then((err, roles) => {
-        if (err) {
-          res.status(500).send({
-            message: err
-          });
-          return;
-        }
+      }).then(roles => {
         user.userRole = roles.map(role => role._id);
-        user.save().then(err => {
-          if (err) {
-            res.status(500).send({
-              message: err
-            });
-            return;
-          }
+        user.save().then(() => {
           res.send({
             message: 'User was registered successfully!'
           });
+        }).catch(err => {
+          res.status(400).send({
+            message: err
+          });
+          return;
         });
+      }).catch(err => {
+        res.status(400).send({
+          message: err
+        });
+        return;
       });
     } else {
-      Role.findOne({
-        name: 'User'
-      }).then((err, role) => {
-        if (err) {
-          res.status(500).send({
-            message: err
-          });
-          return;
-        }
-        user.roles = [role._id];
-        user.save().then(err => {
-          if (err) {
-            res.status(500).send({
-              message: err
-            });
-            return;
-          }
-          res.send({
-            message: 'User was registered successfully!'
-          });
-        });
-      });
-    }
-  });
-
-  /*
-  user.save((err: Error, user: IUser) => {
-      if(err){
-          res.status(500).send(
-              {
-                  message: err
-              }
-          );
-          return;
-      }
-       if(req.body.roles){
-          Role.find(
-              {
-                  name: {$in: req.body.roles},
-              },
-              (err: Error, roles: Array<IUserRole> ) => {
-                  if(err){
-                      res.status(500).send(
-                          {
-                              message: err
-                          }
-                      );
-                      return;
-                  }
-                   user.userRole = roles.map((role) => role._id);
-                  user.save((err: Error) => {
-                      if(err){
-                          res.status(500).send(
-                              {
-                                  message: err
-                              }
-                          );
-                          return;
-                      }
-                       res.send(
-                          {
-                              message: 'User was registered successfully!'
-                          }
-                      );
-                  })
-              }
-          )
-      } else {
-          Role.findOne(
-              {
-                  name: 'user'
-              },
-              (err: Error, role: IUserRole) => {
-                  if(err){
-                      res.status(500).send(
-                          {
-                              message: err
-                          }
-                      );
-                      return;
-                  }
-                   user.roles = [role._id];
-                  user.save((err: Error) => {
-                      if(err){
-                          res.status(500).send(
-                              {
-                                  message: err
-                              }
-                          );
-                          return;
-                      }
-                       res.send(
-                          {
-                              message: 'User was registered successfully!'
-                          }
-                      );
-                  });
-              }
-          )
-      }
-  });
-  */
-};
-
-export const signin = (req, res) => {
-  User.findOne({
-    userUsername: req.body.username
-  }).populate('roles', '-__v').exec((err, user) => {
-    if (err) {
-      res.status(500).send({
-        message: err
+      res.status(400).send({
+        message: 'No user roles supplied!'
       });
       return;
     }
+  }).catch(err => {
+    res.status(400).send({
+      message: err
+    });
+    return;
+  });
+};
+export const signin = (req, res) => {
+  User.findOne({
+    userUserName: req.body.username
+  }).populate('userRole', '-__v').then(user => {
+    // if(err){
+    //     res.status(500).send(
+    //         {
+    //             message: err
+    //         }
+    //     );
+    //     return;
+    // }
+
     if (!user) {
       return res.status(404).send({
         message: 'User not found!'
@@ -172,8 +85,8 @@ export const signin = (req, res) => {
 
     // Should have a type !!??
     let authorities = [];
-    for (let i = 0; i < user.roles.length; i++) {
-      authorities.push('Role_' + user.roles[i].name.toUpperCase());
+    for (let i = 0; i < user.userRole.length; i++) {
+      authorities.push('Role_' + user.userRole[i].name.toUpperCase());
     }
 
     // Might be a little.....
@@ -185,7 +98,15 @@ export const signin = (req, res) => {
       roles: authorities
     });
   });
+  // .catch((err: Error) => {
+  //     res.status(400).send(
+  //         {
+  //             message: err
+  //         }
+  //     )
+  // });
 };
+
 export const signout = async (req, res) => {
   try {
     req.session = null;

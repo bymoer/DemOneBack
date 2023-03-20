@@ -79,6 +79,16 @@ app.use('/api', router);
 
 app.use(express.json());
 
+app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  cookieSession({
+    name: 'demone-session',
+    secret: 'COOKIE_SECRET',
+    httpOnly: true
+  })
+);
+
 // Import of router files
 app.use(userRouter);
 app.use(authRouter);

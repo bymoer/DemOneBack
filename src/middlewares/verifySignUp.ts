@@ -7,58 +7,39 @@ const ROLES = dbHelper.ROLES;
 const User = dbHelper.user;
 //const User = USER_MODEL;
 
-const checkDuplicateUsernameOrEmail = (req: Request, res: Response, next: NextFunction) => {
+const checkDuplicateUsernameOrEmail = async (req: Request, res: Response, next: NextFunction) => {
 
     // Check username
-    User.findOne({
-        userUserName: req.body.username
-    }).then((err: Error, user: IUser) => {
-        if(err) {
-            res.status(500).send(
-                { 
-                    message: err 
-                }
-            );
-            return;
-        }
+    // First Find all users with username OR email - if any, send status 500 with message - then next()
+    
+    try {
 
-        if(user){
+        const duplicate = await User.findOne({ $or: [ {userUserName: req.body.username}, {userEmail: req.body.email} ] });
+
+        if(duplicate){
             res.status(400).send(
                 {
-                    message: 'Failed! Username is already in use!'
+                    message: 'Duplicate username og email!'
                 }
-            );
-            return;
+            )
         }
 
-        // Check email
-        User.findOne({
-            userEmail: req.body.email
-        }).then((err: Error, user: any) => {
-            if(err){
-                res.status(500).send(
-                    {
-                        message: err
-                    }
-                );
-                return;
+        next()
+        
+    } catch (err: any) {
+        
+        res.status(500).send(
+            {
+                message: err
             }
+        )
 
-            if(user){
-                res.status(400).send(
-                    {
-                        message: 'Failed! Email is already in use!'
-                    }
-                );
-            }
-        })
-
-        next();
-
-    })
+    }
 
 }
 
+// Check roles of user
+// If user has role that doesn't exist - send status 400 - then next()
 const checkRolesExist = (req: Request, res: Response, next: NextFunction) => {
     if(req.body.roles){
         for(let i = 0; i < req.body.roles.length; i++){

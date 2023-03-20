@@ -3,43 +3,33 @@ const ROLES = dbHelper.ROLES;
 const User = dbHelper.user;
 //const User = USER_MODEL;
 
-const checkDuplicateUsernameOrEmail = (req, res, next) => {
+const checkDuplicateUsernameOrEmail = async (req, res, next) => {
   // Check username
-  User.findOne({
-    userUserName: req.body.username
-  }).then((err, user) => {
-    if (err) {
-      res.status(500).send({
-        message: err
-      });
-      return;
-    }
-    if (user) {
-      res.status(400).send({
-        message: 'Failed! Username is already in use!'
-      });
-      return;
-    }
+  // First Find all users with username OR email - if any, send status 500 with message - then next()
 
-    // Check email
-    User.findOne({
-      userEmail: req.body.email
-    }).then((err, user) => {
-      if (err) {
-        res.status(500).send({
-          message: err
-        });
-        return;
-      }
-      if (user) {
-        res.status(400).send({
-          message: 'Failed! Email is already in use!'
-        });
-      }
+  try {
+    const duplicate = await User.findOne({
+      $or: [{
+        userUserName: req.body.username
+      }, {
+        userEmail: req.body.email
+      }]
     });
+    if (duplicate) {
+      res.status(400).send({
+        message: 'Duplicate username og email!'
+      });
+    }
     next();
-  });
+  } catch (err) {
+    res.status(500).send({
+      message: err
+    });
+  }
 };
+
+// Check roles of user
+// If user has role that doesn't exist - send status 400 - then next()
 const checkRolesExist = (req, res, next) => {
   if (req.body.roles) {
     for (let i = 0; i < req.body.roles.length; i++) {

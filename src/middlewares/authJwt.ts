@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, request, Request, Response } from "express";
 import jwt from 'jsonwebtoken';
 import { userAuthKey } from "../config/auth.config.js";
 import { dbHelper } from "../models/index.js";
@@ -12,6 +12,9 @@ const secret = userAuthKey.secret;
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
 
     let token = req.session?.token;
+
+    // console.log('This is the token from verifyToken: ')
+    // console.log(token)
 
     if(!token){
         return res.status(403).send(
@@ -32,6 +35,12 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
         }
         
         // Using body instead of setting it directly on the req obj - typescript doesn't like
+        
+        console.log('This should be the decoded id: ')
+        console.log(decoded.id)
+        console.log(decoded)
+        
+
         req.body.userId = decoded.id;
         
         next();
@@ -82,6 +91,8 @@ const isAdmin = (req: Request, res: Response, next: NextFunction) => {
 }
 
 const isModerator = (req: Request, res: Response, next: NextFunction) => {
+
+    //console.log(req.body.userId);
 
     User.findById(req.body.userId).exec((err: Error, user: IUser) => {
         if(err){
