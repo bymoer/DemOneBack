@@ -1,20 +1,17 @@
-import { NextFunction, request, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from 'jsonwebtoken';
 import { userAuthKey } from "../config/auth.config.js";
 import { dbHelper } from "../models/index.js";
 import { IRole } from "../types/role.type.js";
 import { IUser } from "../types/user.type.js";
 
-const User = dbHelper.User;
+const User = dbHelper.user;
 const Role = dbHelper.role;
 const secret = userAuthKey.secret;
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
 
     let token = req.session?.token;
-
-    // console.log('This is the token from verifyToken: ')
-    // console.log(token)
 
     if(!token){
         return res.status(403).send(
@@ -33,57 +30,51 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
                 }
             )
         }
-        
-        // Using body instead of setting it directly on the req obj - typescript doesn't like
-        
-        console.log('This should be the decoded id: ')
-        console.log(decoded.id)
-        console.log(decoded)
-        
 
+        // Needs optimizing
         req.body.userId = decoded.id;
-        
+
         next();
-    })
+    });
 
 }
 
 const isAdmin = (req: Request, res: Response, next: NextFunction) => {
 
-    User.findById(req.body.userId).exec((err: Error, user: IUser) => {
-        if(err){
-            res.status(500).send(
-                {
-                    message: err
-                }
-            );
-        }
+    User.findById(req.body.userId)
+    .then((user: IUser) => {
 
-        Role.find(
-            {
-                _id: { $in: user.userRole },
-            },
-            (err: Error, roles: Array<IRole>) => {
-                if(err){
-                    res.status(500).send(
-                        {
-                            message: err
-                        }
-                    );
-                }
+        Role.find({_id: { $in: user.userRole }})
+            .then((roles: Array<IRole>) => {
 
-                for (let i = 0; i < roles.length; i++){
-                    if(roles[i].name === 'admin') {
+                console.log(roles);
+                console.log(roles.length)
+
+                for ( let i = 0; i < roles.length; i++ ){
+                    
+                    console.log(roles[i].name)
+
+                    if(roles[i].name === 'admin'){
                         next();
                         return;
                     }
+
                 }
 
                 res.status(403).send(
                     {
-                        message: 'Require Admin Role!'
+                        message: 'Admin role required!'
                     }
-                )
+                );
+                return;
+
+            })
+
+    })
+    .catch((err: Error) => {
+        res.status(400).send(
+            {
+                message: 'Error confirming User Role!'
             }
         )
     })
@@ -92,48 +83,43 @@ const isAdmin = (req: Request, res: Response, next: NextFunction) => {
 
 const isModerator = (req: Request, res: Response, next: NextFunction) => {
 
-    //console.log(req.body.userId);
+    User.findById(req.body.userId)
+        .then((user: IUser) => {
 
-    User.findById(req.body.userId).exec((err: Error, user: IUser) => {
-        if(err){
-            res.status(500).send(
-                {
-                    message: err
-                }
-            );
-            return;
-        }
+            Role.find({_id: { $in: user.userRole }})
+                .then((roles: Array<IRole>) => {
 
-        Role.find(
-            {
-                _id: { $in: user.userRole },
-            },
-            (err: Error, roles: Array<IRole>) => {
-                if(err){
-                    res.status(500).send(
+                    console.log(roles);
+                    console.log(roles.length)
+
+                    for ( let i = 0; i < roles.length; i++ ){
+                        
+                        console.log(roles[i].name)
+
+                        if(roles[i].name === 'moderator'){
+                            next();
+                            return;
+                        }
+
+                    }
+
+                    res.status(403).send(
                         {
-                            message: err
+                            message: 'Moderator role required!'
                         }
                     );
                     return;
-                }
 
-                for ( let i = 0; i < roles.length; i++ ) {
-                    if(roles[i].name === 'moderator'){
-                        next();
-                        return;
-                    }
-                }
+                })
 
-                res.status(403).send(
-                    {
-                        message: 'Require moderator Role!'
-                    }
-                );
-                return;
-            }
-        )
-    })
+        })
+        .catch((err: Error) => {
+            res.status(400).send(
+                {
+                    message: 'Error confirming User Role!'
+                }
+            )
+        })
 
 }
 

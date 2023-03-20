@@ -2,7 +2,6 @@ import { ObjectId } from "mongodb"
 
 export interface IUser {
     [x: string]: any
-    userId: string,
     userFirstName: string,
     userMiddleName: string,
     userLastName: string,

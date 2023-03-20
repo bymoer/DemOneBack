@@ -46,6 +46,9 @@ router.get('/', (req, res) => {
 });
 app.use('/api', router);
 app.use(express.json());
+app.use(express.urlencoded({
+  extended: true
+}));
 app.use(cookieSession({
   name: 'demone-session',
   secret: 'COOKIE_SECRET',

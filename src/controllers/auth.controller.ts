@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { userAuthKey } from "../config/auth.config.js";
 import { dbHelper } from "../models/index.js";
 import jwt from 'jsonwebtoken';
@@ -98,14 +98,6 @@ export const signin = (req: Request, res: Response) => {
     )
     .populate('userRole', '-__v')
     .then((user: IUser) => {
-        // if(err){
-        //     res.status(500).send(
-        //         {
-        //             message: err
-        //         }
-        //     );
-        //     return;
-        // }
 
         if(!user){
             return res.status(404).send(
@@ -122,7 +114,7 @@ export const signin = (req: Request, res: Response) => {
 
         let token = jwt.sign(
             {
-                id: user.userId
+                id: user.id
             },
             userAuthKey.secret,
             {
@@ -142,23 +134,23 @@ export const signin = (req: Request, res: Response) => {
 
         res.status(200).send(
             {
-                id: user.userId,
+                id: user._id,
                 username: user.userUserName,
                 email: user.userEmail,
                 roles: authorities
             }
         );
+    })
+    .catch((err: Error) => {
+        res.status(500).send(
+            {
+                message: err
+            }
+        )
     });
-    // .catch((err: Error) => {
-    //     res.status(400).send(
-    //         {
-    //             message: err
-    //         }
-    //     )
-    // });
 }
 
-export const signout = async(req: Request, res: Response) => {
+export const signout = async(req: Request, res: Response, next: NextFunction) => {
     try {
         req.session = null;
         return res.status(200).send(
@@ -168,7 +160,7 @@ export const signout = async(req: Request, res: Response) => {
         )
     } catch (err) {
         // TS issue
-        //this.next(err);
+        next(err);
     }
 }
 

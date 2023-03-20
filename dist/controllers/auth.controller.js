@@ -62,15 +62,6 @@ export const signin = (req, res) => {
   User.findOne({
     userUserName: req.body.username
   }).populate('userRole', '-__v').then(user => {
-    // if(err){
-    //     res.status(500).send(
-    //         {
-    //             message: err
-    //         }
-    //     );
-    //     return;
-    // }
-
     if (!user) {
       return res.status(404).send({
         message: 'User not found!'
@@ -78,7 +69,7 @@ export const signin = (req, res) => {
     }
     let passwordIsValid = bcrypt.compareSync(req.body.password, user.userPassword);
     let token = jwt.sign({
-      id: user.userId
+      id: user.id
     }, userAuthKey.secret, {
       expiresIn: 86400
     });
@@ -92,22 +83,18 @@ export const signin = (req, res) => {
     // Might be a little.....
     req.session.token = token;
     res.status(200).send({
-      id: user.userId,
+      id: user._id,
       username: user.userUserName,
       email: user.userEmail,
       roles: authorities
     });
+  }).catch(err => {
+    res.status(500).send({
+      message: err
+    });
   });
-  // .catch((err: Error) => {
-  //     res.status(400).send(
-  //         {
-  //             message: err
-  //         }
-  //     )
-  // });
 };
-
-export const signout = async (req, res) => {
+export const signout = async (req, res, next) => {
   try {
     req.session = null;
     return res.status(200).send({
@@ -115,7 +102,7 @@ export const signout = async (req, res) => {
     });
   } catch (err) {
     // TS issue
-    //this.next(err);
+    next(err);
   }
 };
 export const controller = {
