@@ -20,6 +20,6 @@ export const BOOKING_MODEL = mongoose.model(
         durationStart: Date,
         durationEnd: Date,
         numberOfPeople: String,
-        bookingApproved: String,
+        bookingVerified: String,
     })
 )

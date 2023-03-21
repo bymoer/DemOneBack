@@ -89,12 +89,12 @@ const isModerator = (req: Request, res: Response, next: NextFunction) => {
             Role.find({_id: { $in: user.userRole }})
                 .then((roles: Array<IRole>) => {
 
-                    console.log(roles);
-                    console.log(roles.length)
+                    // console.log(roles);
+                    // console.log(roles.length)
 
                     for ( let i = 0; i < roles.length; i++ ){
                         
-                        console.log(roles[i].name)
+                        //console.log(roles[i].name)
 
                         if(roles[i].name === 'moderator'){
                             next();
