@@ -1,15 +1,15 @@
 import { ITask } from "./task.type.js";
 
 export interface IEmployee {
-    employeeName: String,
-    employeeRoad: String,
-    employeeRoadNr: String,
-    employeeCity: String,
-    employeePostCode: String,
-    employeeCountry: String,
-    employeeAssignedWorkplace: String,
-    employeeTitle: String,
-    employeeRole: String,
-    employeeWeekHours: Number,
+    employeeName: string,
+    employeeRoad: string,
+    employeeRoadNr: string,
+    employeeCity: string,
+    employeePostCode: string,
+    employeeCountry: string,
+    employeeAssignedWorkplace: string,
+    employeeTitle: string,
+    employeeRole: string,
+    employeeWeekHours: number,
     employeeTasks: ITask[],
 }

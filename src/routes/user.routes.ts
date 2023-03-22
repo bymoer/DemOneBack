@@ -12,6 +12,10 @@ app.use( (req: Request, res: Response, next: NextFunction) => {
     next();
 })
 
+/**
+ * Test routes
+ */
+
 app.get(
     '/api/test/all',
     userController.allAccess
@@ -34,5 +38,15 @@ app.get(
     [authJwt.verifyToken, authJwt.isAdmin],
     userController.adminBoard
 );
+
+/**
+ * Hotel routes
+ */
+
+app.get(
+    '/api/mod/hotel',
+    [authJwt.verifyToken, authJwt.isModerator],
+    userController.moderatorHotel
+)
 
 export default app;

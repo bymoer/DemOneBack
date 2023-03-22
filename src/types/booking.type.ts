@@ -11,10 +11,7 @@ export interface IBooking {
         postalCode: string,
         country: string
     },
-    roomBooked: {
-        type: ObjectId,
-        ref: 'Room',
-    },
+    roomBooked: string,
     durationStart: Date,
     durationEnd: Date,
     numberOfPeople: string,

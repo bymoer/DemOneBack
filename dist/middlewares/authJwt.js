@@ -59,10 +59,12 @@ const isModerator = (req, res, next) => {
         $in: user.userRole
       }
     }).then(roles => {
-      console.log(roles);
-      console.log(roles.length);
+      // console.log(roles);
+      // console.log(roles.length)
+
       for (let i = 0; i < roles.length; i++) {
-        console.log(roles[i].name);
+        //console.log(roles[i].name)
+
         if (roles[i].name === 'moderator') {
           next();
           return;

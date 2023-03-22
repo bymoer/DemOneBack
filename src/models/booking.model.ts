@@ -13,10 +13,7 @@ export const BOOKING_MODEL = mongoose.model(
             postalCode: String,
             country: String
         },
-        roomBooked: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Room',
-        },
+        roomBooked: String,
         durationStart: Date,
         durationEnd: Date,
         numberOfPeople: String,
