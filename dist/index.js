@@ -7,6 +7,10 @@ const app = express();
 // Importing router files
 import userRouter from './routes/user.routes.js';
 import authRouter from './routes/auth.routes.js';
+
+// Moderator and admin routes
+import moderatorRouter from './routes/moderator.routes.js';
+import adminRouter from './routes/admin.routes.js';
 const router = express.Router();
 const port = 5000;
 const Role = dbHelper.role;
@@ -58,6 +62,8 @@ app.use(cookieSession({
 // Import of router files
 app.use(userRouter);
 app.use(authRouter);
+app.use(moderatorRouter);
+app.use(adminRouter);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
