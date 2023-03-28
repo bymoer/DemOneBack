@@ -7,16 +7,16 @@ export const BOOKING_MODEL = mongoose.model(
         customerMiddleName: String,
         customerLastName: String,
         customerPhone: String,
+        roomBooked: String,
+        durationStart: Date,
+        durationEnd: Date,
+        numberOfPeople: String,
+        bookingVerified: Boolean,
         customerAddress: {
             road: String,
             number: String,
             postalCode: String,
             country: String
-        },
-        roomBooked: String,
-        durationStart: Date,
-        durationEnd: Date,
-        numberOfPeople: String,
-        bookingVerified: String,
+        }
     })
 )
