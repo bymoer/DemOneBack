@@ -82,6 +82,9 @@ export const signin = (req, res) => {
 
     // Might be a little.....
     req.session.token = token;
+
+    // Simply testing something out
+    req.session.roles = user.userRole;
     res.status(200).send({
       id: user._id,
       username: user.userUserName,

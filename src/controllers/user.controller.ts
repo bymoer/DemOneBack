@@ -13,7 +13,7 @@ const Employee = dbHelper.employee;
 const Task = dbHelper.task;
 
 export const allAccess = (req: Request, res: Response) => {
-    res.status(200).send('Public content!')
+    res.status(200).send(JSON.stringify('Public content!'))
 }
 
 export const userBoard = (req: Request, res: Response) => {

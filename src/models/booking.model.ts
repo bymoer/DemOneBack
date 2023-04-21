@@ -7,6 +7,7 @@ export const BOOKING_MODEL = mongoose.model(
         customerMiddleName: String,
         customerLastName: String,
         customerPhone: String,
+        customerEmail: String,
         roomBooked: String,
         durationStart: Date,
         durationEnd: Date,
